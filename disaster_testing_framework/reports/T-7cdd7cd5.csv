@@ -1,0 +1,2 @@
+Test ID,Type,Date,Duration,Users,Requests,Success Rate,Avg Response,CPU,Memory,Perf Score,Rel Score
+T-7cdd7cd5,Load,2026-10-04 15:29:18,13.9,100,1473,100.0%,765.98ms,19.7%,82.0%,86.7,100.0

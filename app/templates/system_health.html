@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}System Health{% endblock %}
+{% block heading %}Live System Health Monitoring{% endblock %}
+{% block content %}
+<div class="stat-grid">
+  <div class="card-dark"><div class="metric-label">CPU</div><div class="metric-value">{{ health.cpu_percent }}%</div></div>
+  <div class="card-dark"><div class="metric-label">Memory</div><div class="metric-value">{{ health.memory_percent }}%</div><div class="small">{{ health.memory_used_mb }} / {{ health.memory_total_mb }} MB</div></div>
+  <div class="card-dark"><div class="metric-label">Disk</div><div class="metric-value">{{ health.disk_percent }}%</div></div>
+  <div class="card-dark"><div class="metric-label">Network</div><div class="metric-value">{{ health.net_mb_s }} MB/s</div></div>
+  <div class="card-dark"><div class="metric-label">Status</div><div class="metric-value">{{ health.status }}</div></div>
+</div>
+<p class="small text-warning">Host-level psutil readings for this demonstration machine — not a production operations feed.</p>
+{% endblock %}

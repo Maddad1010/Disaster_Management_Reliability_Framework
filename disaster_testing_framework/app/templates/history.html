@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Test History</h2>
+<table class="table table-bordered mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>Test ID</th>
+            <th>Type</th>
+            <th>Users</th>
+            <th>Duration(s)</th>
+            <th>Avg Response (ms)</th>
+            <th>Success Rate</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for h in history %}
+        <tr>
+            <td>{{ h.test_id }}</td>
+            <td>{{ h.test_type }}</td>
+            <td>{{ h.users }}</td>
+            <td>{{ h.duration }}</td>
+            <td>{{ h.avg_response_time }}</td>
+            <td>{{ h.success_rate }}%</td>
+            <td>
+                <span class="badge {% if h.status == 'PASS' %}bg-success{% elif h.status == 'WARNING' %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ h.status }}
+                </span>
+            </td>
+            <td>{{ h.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

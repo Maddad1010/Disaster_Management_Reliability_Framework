@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Emergency Contacts{% endblock %}
+{% block heading %}Emergency Contacts{% endblock %}
+{% block content %}
+<div class="alert alert-warning">These numbers are <strong>DEMO DATA</strong> displayed for the academic portal only. Do not treat this page as an operational dispatch board.</div>
+<div class="stat-grid">
+  {% for c in contacts %}
+  <div class="card-dark text-center">
+    <div class="metric-label">{{ c.service }}</div>
+    <div class="metric-value">{{ c.number }}</div>
+    <div class="badge bg-warning text-dark mt-2">{{ c.note }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

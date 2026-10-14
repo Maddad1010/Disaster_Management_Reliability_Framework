@@ -1,0 +1,26 @@
+{
+    "test_id": "T-995f87bf",
+    "test_type": "Load",
+    "date": "2026-10-04T17:19:41.510533",
+    "duration": 15.5,
+    "users": 100,
+    "metrics": {
+        "total_requests": 1054,
+        "successful_requests": 960,
+        "failed_requests": 94,
+        "success_rate": 91.1,
+        "error_rate": 8.92
+    },
+    "performance": {
+        "avg_response_time": 1202.77,
+        "requests_per_second": 67.82
+    },
+    "resources": {
+        "cpu": 42.8,
+        "memory": 75.1
+    },
+    "results": {
+        "performance_score": 34.9,
+        "reliability_score": 91.1
+    }
+}

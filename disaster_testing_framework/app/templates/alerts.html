@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Disaster Alerts</h2>
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Severity</th>
+            <th>Reported Time</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in disasters %}
+        <tr>
+            <td>{{ d.disaster_type }}</td>
+            <td>{{ d.location }}</td>
+            <td>
+                <span class="badge {% if d.severity == 'High' %}bg-danger{% elif d.severity == 'Medium' %}bg-warning{% else %}bg-info{% endif %}">
+                    {{ d.severity }}
+                </span>
+            </td>
+            <td>{{ d.reported_time }}</td>
+            <td>{{ d.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

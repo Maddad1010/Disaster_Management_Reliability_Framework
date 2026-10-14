@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>System Status Dashboard</h2>
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-header">System Status</div>
+            <div class="card-body">
+                <h5 class="card-title">ONLINE</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Active Disasters</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ active_disasters }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header">Available Shelters</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ shelters }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Pending Rescues</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ rescues }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

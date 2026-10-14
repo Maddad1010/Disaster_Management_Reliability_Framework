@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Shelters{% endblock %}
+{% block heading %}Shelter Management{% endblock %}
+{% block content %}
+<div class="card-dark">
+  <h2>Shelter Inventory <span class="badge bg-warning text-dark">DEMO DATA</span></h2>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Shelter</th><th>Location</th><th>Capacity</th><th>Occupied</th><th>Available</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in shelters %}
+        <tr>
+          <td>{{ s.name }}</td>
+          <td>{{ s.location }}</td>
+          <td>{{ s.capacity }}</td>
+          <td>{{ s.occupied }}</td>
+          <td>{{ s.available }}</td>
+          <td>
+            {% set cls = 'bg-success' if s.status == 'OPEN' else 'bg-warning text-dark' if s.status == 'LIMITED' else 'bg-danger' %}
+            <span class="badge {{ cls }}">{{ s.status }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Disaster Alerts{% endblock %}
+{% block heading %}Disaster Alerts{% endblock %}
+{% block content %}
+<div class="card-dark">
+  <h2>Alert Feed <span class="badge bg-warning text-dark">DEMO DATA</span></h2>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Type</th><th>Severity</th><th>Location</th><th>Description</th><th>Date/Time</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in alerts %}
+        <tr>
+          <td>{{ a.disaster_type }}</td>
+          <td><span class="badge {{ 'bg-danger' if a.severity in ['High','Severe','Critical'] else 'bg-warning text-dark' }}">{{ a.severity }}</span></td>
+          <td>{{ a.location }}</td>
+          <td>{{ a.description }}</td>
+          <td class="small">{{ a.created_at }}</td>
+          <td><span class="badge bg-success">{{ a.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

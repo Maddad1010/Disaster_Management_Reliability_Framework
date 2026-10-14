@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block heading %}Settings{% endblock %}
+{% block subtitle %}Demonstration thresholds — not universal industry standards{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card-dark">
+      <h2>Automatic Pass / Warning / Fail</h2>
+      <p class="small text-warning">These cutoffs exist so the academic dashboard can label a run. They are not SLOs.</p>
+      <form method="post">
+        <div class="row g-2">
+          <div class="col-md-6"><label class="form-label">PASS max avg response (ms)</label><input class="form-control" name="pass_max_avg_response_ms" value="{{ thresholds.pass_max_avg_response_ms }}"></div>
+          <div class="col-md-6"><label class="form-label">PASS max error rate (%)</label><input class="form-control" name="pass_max_error_rate" value="{{ thresholds.pass_max_error_rate }}"></div>
+          <div class="col-md-6"><label class="form-label">PASS min success rate (%)</label><input class="form-control" name="pass_min_success_rate" value="{{ thresholds.pass_min_success_rate }}"></div>
+          <div class="col-md-6"><label class="form-label">WARNING max avg response (ms)</label><input class="form-control" name="warning_max_avg_response_ms" value="{{ thresholds.warning_max_avg_response_ms }}"></div>
+          <div class="col-md-6"><label class="form-label">WARNING max error rate (%)</label><input class="form-control" name="warning_max_error_rate" value="{{ thresholds.warning_max_error_rate }}"></div>
+          <div class="col-md-6"><label class="form-label">Stress break avg response (ms)</label><input class="form-control" name="stress_break_avg_response_ms" value="{{ thresholds.stress_break_avg_response_ms }}"></div>
+          <div class="col-md-6"><label class="form-label">Stress break error rate (%)</label><input class="form-control" name="stress_break_error_rate" value="{{ thresholds.stress_break_error_rate }}"></div>
+        </div>
+        <button class="btn btn-emergency mt-3">Save thresholds</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card-dark">
+      <h2>Failure Simulation</h2>
+      <p class="small text-warning">DEMO / TESTING MODE ONLY</p>
+      <form method="post" action="{{ url_for('testing.apply_simulation') }}">
+        <input type="hidden" name="next" value="settings">
+        <div class="mb-2"><label class="form-label">API Delay (ms)</label><input class="form-control" name="api_delay_ms" value="{{ simulation.api_delay_ms }}"></div>
+        <div class="mb-2"><label class="form-label">DB Delay (ms)</label><input class="form-control" name="db_delay_ms" value="{{ simulation.db_delay_ms }}"></div>
+        <div class="mb-2"><label class="form-label">Failure Probability (%)</label><input class="form-control" name="failure_probability" value="{{ simulation.failure_probability }}"></div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="service_unavailable" {% if simulation.service_unavailable %}checked{% endif %}>
+          <label class="form-check-label">Service unavailable</label>
+        </div>
+        <button class="btn btn-outline-danger">Apply</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

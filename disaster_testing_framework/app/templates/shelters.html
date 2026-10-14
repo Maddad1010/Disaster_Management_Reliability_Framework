@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Shelter Management</h2>
+<table class="table table-hover mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Capacity</th>
+            <th>Available Spaces</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in shelters %}
+        <tr>
+            <td>{{ s.name }}</td>
+            <td>{{ s.location }}</td>
+            <td>{{ s.capacity }}</td>
+            <td>{{ s.available }}</td>
+            <td>
+                <span class="badge {% if s.status == 'OPEN' %}bg-success{% else %}bg-secondary{% endif %}">
+                    {{ s.status }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

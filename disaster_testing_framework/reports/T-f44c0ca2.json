@@ -1,0 +1,26 @@
+{
+    "test_id": "T-f44c0ca2",
+    "test_type": "Load",
+    "date": "2026-10-04T13:58:53.369939",
+    "duration": 14.7,
+    "users": 100,
+    "metrics": {
+        "total_requests": 1328,
+        "successful_requests": 1328,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "error_rate": 0.0
+    },
+    "performance": {
+        "avg_response_time": 907.79,
+        "requests_per_second": 90.37
+    },
+    "resources": {
+        "cpu": 38.8,
+        "memory": 84.0
+    },
+    "results": {
+        "performance_score": 79.6,
+        "reliability_score": 100.0
+    }
+}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Disaster Reports{% endblock %}
+{% block heading %}Disaster Reports{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card-dark">
+      <h2>Report a Disaster</h2>
+      <p class="small text-warning">Stored locally as DEMO DATA. No real responders are notified.</p>
+      <form method="post">
+        <div class="mb-2">
+          <label class="form-label">Disaster type</label>
+          <select class="form-select" name="disaster_type">
+            {% for t in disaster_types %}<option>{{ t }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-2"><label class="form-label">Location</label><input class="form-control" name="location" required></div>
+        <div class="mb-2">
+          <label class="form-label">Severity</label>
+          <select class="form-select" name="severity">
+            {% for s in severities %}<option {{ 'selected' if s == 'Moderate' else '' }}>{{ s }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-2"><label class="form-label">Affected people</label><input class="form-control" type="number" min="0" name="affected_people" value="0"></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" name="description" required></textarea></div>
+        <button class="btn btn-emergency w-100" type="submit">Submit Report</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card-dark">
+      <h2>Submitted Reports</h2>
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead><tr><th>Type</th><th>Location</th><th>Severity</th><th>Affected</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for r in reports %}
+            <tr>
+              <td>{{ r.disaster_type }}</td>
+              <td>{{ r.location }}</td>
+              <td>{{ r.severity }}</td>
+              <td>{{ r.affected_people }}</td>
+              <td>{{ r.status }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

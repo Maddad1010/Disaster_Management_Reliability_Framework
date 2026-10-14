@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Performance Testing{% endblock %}
+{% block heading %}Performance Testing Dashboard{% endblock %}
+{% block subtitle %}Configure a real HTTP load against this portal, then watch live metrics{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card-dark">
+      <h2>Test Configuration</h2>
+      <form method="post" action="{{ url_for('testing.start_test') }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Test Type</label>
+            <select class="form-select" name="test_type">
+              {% for value, label in test_types %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Number of Users</label>
+            <select class="form-select" name="users">
+              {% for u in user_presets %}
+                <option value="{{ u }}" {{ 'selected' if u == 100 else '' }}>{{ u }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Test Duration (seconds)</label>
+            <select class="form-select" name="duration">
+              {% for d in duration_presets %}
+                <option value="{{ d }}" {{ 'selected' if d == 60 else '' }}>{{ d }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Spawn Rate (users/sec)</label>
+            <input class="form-control" type="number" name="spawn_rate" value="10" min="1" max="500">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Target Endpoint</label>
+            <select class="form-select" name="target_endpoint">
+              {% for e in endpoints %}
+                <option value="{{ e }}">{{ e }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-emergency" type="submit" {% if running %}disabled{% endif %}>START TEST</button>
+        </div>
+      </form>
+      {% if running %}
+      <form method="post" action="{{ url_for('testing.stop_test') }}" class="mt-2">
+        <button class="btn btn-outline-warning">STOP TEST</button>
+      </form>
+      {% endif %}
+      <p class="small mt-3 mb-0 text-info">Recommended demo: Load Test · 100 users · 60 seconds · /api/alerts</p>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card-dark mb-3">
+      <h2>Failure Simulation</h2>
+      <p class="small text-warning">DEMO / TESTING MODE ONLY — never used against real emergency services.</p>
+      <form method="post" action="{{ url_for('testing.apply_simulation') }}">
+        <div class="mb-2">
+          <label class="form-label">API Delay (ms)</label>
+          <input class="form-control" type="number" min="0" max="5000" name="api_delay_ms" value="{{ simulation.api_delay_ms }}">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Database Delay (ms)</label>
+          <input class="form-control" type="number" min="0" max="5000" name="db_delay_ms" value="{{ simulation.db_delay_ms }}">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Failure Probability (%)</label>
+          <input class="form-control" type="number" min="0" max="100" step="0.1" name="failure_probability" value="{{ simulation.failure_probability }}">
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="service_unavailable" id="unavail" {% if simulation.service_unavailable %}checked{% endif %}>
+          <label class="form-check-label" for="unavail">Temporary service unavailable (HTTP 503)</label>
+        </div>
+        <button class="btn btn-outline-danger">APPLY SIMULATION</button>
+      </form>
+    </div>
+    <div class="card-dark">
+      <h3>Test types</h3>
+      <ul class="small mb-0">
+        <li><strong>Smoke</strong> — sequential checks of core APIs</li>
+        <li><strong>Load</strong> — concurrent users for a fixed duration</li>
+        <li><strong>Stress</strong> — ramps 100 → 500 → 1000 → 2000 → 5000</li>
+        <li><strong>Spike</strong> — baseline then a sudden surge</li>
+        <li><strong>Endurance</strong> — sustained load for the chosen duration</li>
+        <li><strong>Reliability</strong> — repeated API calls and success ratio</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

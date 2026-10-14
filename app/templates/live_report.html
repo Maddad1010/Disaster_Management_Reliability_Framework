@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Live Monitor{% endblock %}
+{% block heading %}Live Testing Dashboard{% endblock %}
+{% block subtitle %}Metrics refresh every 1 second. Scores are calculated from collected samples.{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <span id="modeBanner" class="mode-banner mode-demo">DEMO DATA</span>
+    <span id="testMeta" class="ms-2 small"></span>
+  </div>
+  <form method="post" action="{{ url_for('testing.stop_test') }}">
+    <button class="btn btn-outline-warning btn-sm">STOP TEST</button>
+  </form>
+</div>
+
+<div class="stat-grid">
+  <div class="card-dark"><div class="metric-label">Active Users</div><div class="metric-value" id="mUsers">0</div></div>
+  <div class="card-dark"><div class="metric-label">Requests</div><div class="metric-value" id="mReq">0</div></div>
+  <div class="card-dark"><div class="metric-label">Success Rate</div><div class="metric-value text-success" id="mOk">0%</div></div>
+  <div class="card-dark"><div class="metric-label">Avg Response</div><div class="metric-value text-warning" id="mRt">0 ms</div></div>
+  <div class="card-dark"><div class="metric-label">Error Rate</div><div class="metric-value text-danger" id="mErr">0%</div></div>
+  <div class="card-dark"><div class="metric-label">CPU Usage</div><div class="metric-value" id="mCpu">0%</div></div>
+</div>
+
+<div class="stat-grid">
+  <div class="card-dark">
+    <div class="metric-label">Performance Score (project-defined)</div>
+    <div class="metric-value" id="mPerf">—</div>
+    <div id="mPerfLabel" class="small text-info"></div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">Reliability Score</div>
+    <div class="metric-value" id="mRel">—</div>
+    <div class="progress mt-2"><div id="relBar" class="progress-bar bg-success" style="width:0%"></div></div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">Overall Status</div>
+    <div class="metric-value" id="mStatus">—</div>
+    <div class="small" id="mBreak"></div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">System Health</div>
+    <div class="metric-value" id="mHealth">—</div>
+    <div class="small" id="mSys">CPU / RAM / Disk / Net</div>
+  </div>
+</div>
+
+<div class="chart-grid mb-3">
+  <div class="card-dark"><canvas id="chartRt"></canvas></div>
+  <div class="card-dark"><canvas id="chartRps"></canvas></div>
+  <div class="card-dark"><canvas id="chartPie"></canvas></div>
+  <div class="card-dark"><canvas id="chartCpu"></canvas></div>
+  <div class="card-dark"><canvas id="chartMem"></canvas></div>
+  <div class="card-dark"><canvas id="chartUsers"></canvas></div>
+</div>
+
+<div class="card-dark" id="smokeBox" style="display:none">
+  <h3>Smoke results</h3>
+  <pre id="smokePre" class="mb-0"></pre>
+</div>
+<div class="card-dark mt-3" id="reportBox" style="display:none">
+  <h3>Generated reports</h3>
+  <div id="reportLinks"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/live.js') }}"></script>
+{% endblock %}

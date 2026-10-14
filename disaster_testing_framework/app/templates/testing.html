@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">Test Configuration</div>
+            <div class="card-body">
+                <form id="testForm">
+                    <div class="mb-3">
+                        <label>Test Type</label>
+                        <select class="form-select" id="testType">
+                            <option value="Load">Load Test</option>
+                            <option value="Stress">Stress Test</option>
+                            <option value="Spike">Spike Test</option>
+                            <option value="Endurance">Endurance Test</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Number of Users</label>
+                        <input type="number" class="form-control" id="users" value="100">
+                    </div>
+                    <div class="mb-3">
+                        <label>Duration (seconds)</label>
+                        <input type="number" class="form-control" id="duration" value="60">
+                    </div>
+                    <div class="mb-3">
+                        <label>Target Endpoint</label>
+                        <select class="form-select" id="endpoint">
+                            <option value="/api/alerts">/api/alerts</option>
+                            <option value="/api/health">/api/health</option>
+                            <option value="/api/shelters">/api/shelters</option>
+                            <option value="/api/rescue-requests">/api/rescue-requests</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-success w-100" id="startBtn" onclick="startTest()">START TEST</button>
+                    <button type="button" class="btn btn-danger w-100 mt-2" id="stopBtn" onclick="stopTest()" disabled>STOP TEST</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-3">
+            <div class="card-header bg-warning">Failure Simulation</div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <label>API Delay (ms)</label>
+                    <input type="number" id="apiDelay" class="form-control" value="0">
+                </div>
+                <div class="mb-2">
+                    <label>Failure Probability (%)</label>
+                    <input type="number" id="failProb" class="form-control" value="0">
+                </div>
+                <button type="button" class="btn btn-secondary w-100" onclick="applySimulation()">APPLY SIMULATION</button>
+                <small class="text-muted d-block mt-2">DEMO / TESTING MODE ONLY</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card text-center bg-light">
+                    <div class="card-body">
+                        <h5>ACTIVE USERS</h5>
+                        <h2 id="activeUsers">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card text-center bg-light">
+                    <div class="card-body">
+                        <h5>REQUESTS</h5>
+                        <h2 id="totalRequests">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card text-center bg-light">
+                    <div class="card-body">
+                        <h5>AVG RESPONSE</h5>
+                        <h2 id="avgResponse">0 ms</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card text-center bg-light">
+                    <div class="card-body">
+                        <h5>SUCCESS RATE</h5>
+                        <h2 id="successRate">0%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <canvas id="responseChart" width="400" height="150"></canvas>
+            </div>
+            <div class="col-md-6 mt-3">
+                <canvas id="statusChart" width="200" height="200"></canvas>
+            </div>
+            <div class="col-md-6 mt-3">
+                <div class="card">
+                    <div class="card-header">System Health</div>
+                    <div class="card-body">
+                        <p>CPU Usage: <span id="cpuUsage">0%</span></p>
+                        <p>Memory Usage: <span id="memUsage">0%</span></p>
+                    </div>
+                </div>
+                <div class="card mt-2">
+                    <div class="card-header">Results</div>
+                    <div class="card-body text-center">
+                        <h6>Performance Score</h6>
+                        <h3 id="perfScore" class="text-primary">-</h3>
+                        <h6>Reliability Score</h6>
+                        <h3 id="relScore" class="text-success">-</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Result Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+    <div id="resultToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold">
+                ✅ Test Complete!&nbsp;
+                Performance: <span id="toastPerf">-</span> &nbsp;|&nbsp;
+                Reliability: <span id="toastRel">-</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let pollInterval = null;
+    let testFinalized = false;
+    let responseChart, statusChart;
+    
+    // Initialize charts
+    const ctxResp = document.getElementById('responseChart').getContext('2d');
+    responseChart = new Chart(ctxResp, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Avg Response Time (ms)',
+                data: [],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13,110,253,0.1)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: { animation: false, scales: { y: { beginAtZero: true } } }
+    });
+
+    const ctxStat = document.getElementById('statusChart').getContext('2d');
+    statusChart = new Chart(ctxStat, {
+        type: 'doughnut',
+        data: {
+            labels: ['Success', 'Failed'],
+            datasets: [{ data: [0, 0], backgroundColor: ['#198754', '#dc3545'] }]
+        }
+    });
+
+    async function applySimulation() {
+        await fetch('/testing/simulate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                delay: parseInt(document.getElementById('apiDelay').value),
+                probability: parseInt(document.getElementById('failProb').value)
+            })
+        });
+        alert('Simulation settings applied.');
+    }
+
+    async function startTest() {
+        testFinalized = false;
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        document.getElementById('perfScore').innerText = '-';
+        document.getElementById('relScore').innerText = '-';
+
+        // Reset charts
+        responseChart.data.labels = [];
+        responseChart.data.datasets[0].data = [];
+        responseChart.update();
+        statusChart.data.datasets[0].data = [0, 0];
+        statusChart.update();
+
+        const res = await fetch('/testing/start', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                type: document.getElementById('testType').value,
+                users: parseInt(document.getElementById('users').value),
+                duration: parseInt(document.getElementById('duration').value),
+                endpoint: document.getElementById('endpoint').value
+            })
+        });
+        const data = await res.json();
+        if (data.error) {
+            alert('Could not start: ' + data.error);
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            return;
+        }
+
+        pollInterval = setInterval(fetchMetrics, 1000);
+    }
+
+    async function stopTest() {
+        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+        document.getElementById('stopBtn').disabled = true;
+
+        const res = await fetch('/testing/stop', { method: 'POST' });
+        const data = await res.json();
+        showFinalResults(data);
+        document.getElementById('startBtn').disabled = false;
+    }
+
+    async function fetchMetrics() {
+        try {
+            const res = await fetch('/testing/metrics');
+            const data = await res.json();
+
+            if (!data.running) {
+                // Test has stopped (naturally or was stopped)
+                if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+
+                if (data.finished && !testFinalized) {
+                    testFinalized = true;
+                    // Save to DB (natural end)
+                    await fetch('/testing/finalize', { method: 'POST' });
+                    showFinalResults(data);
+                }
+                return;
+            }
+
+            updateLiveUI(data);
+        } catch (e) {
+            console.error('Metrics fetch error:', e);
+        }
+    }
+
+    function updateLiveUI(data) {
+        document.getElementById('activeUsers').innerText = data.users || 0;
+        document.getElementById('totalRequests').innerText = (data.requests || 0).toLocaleString();
+        document.getElementById('avgResponse').innerText = (data.avg_response_ms || 0).toFixed(1) + ' ms';
+
+        const succRate = data.requests > 0 ? ((data.success / data.requests) * 100).toFixed(1) : 0;
+        document.getElementById('successRate').innerText = succRate + '%';
+
+        document.getElementById('cpuUsage').innerText = (data.cpu_usage || 0).toFixed(1) + '%';
+        document.getElementById('memUsage').innerText = (data.memory_usage || 0).toFixed(1) + '%';
+
+        // Update charts
+        const timeLabel = (data.elapsed || 0).toFixed(0) + 's';
+        responseChart.data.labels.push(timeLabel);
+        responseChart.data.datasets[0].data.push(data.avg_response_ms || 0);
+        if (responseChart.data.labels.length > 30) {
+            responseChart.data.labels.shift();
+            responseChart.data.datasets[0].data.shift();
+        }
+        responseChart.update();
+
+        statusChart.data.datasets[0].data = [data.success || 0, data.failed || 0];
+        statusChart.update();
+    }
+
+    function showFinalResults(data) {
+        // Update all metric cards with final values
+        updateLiveUI(data);
+
+        // Show scores
+        const perf = data.performance_score ?? '-';
+        const rel = data.reliability_score ?? '-';
+        document.getElementById('perfScore').innerText = perf !== '-' ? perf + '/100' : '-';
+        document.getElementById('relScore').innerText = rel !== '-' ? rel + '%' : '-';
+
+        // Color performance score
+        const perfEl = document.getElementById('perfScore');
+        if (perf >= 90) perfEl.className = 'text-success fw-bold fs-3';
+        else if (perf >= 70) perfEl.className = 'text-primary fw-bold fs-3';
+        else if (perf >= 50) perfEl.className = 'text-warning fw-bold fs-3';
+        else perfEl.className = 'text-danger fw-bold fs-3';
+
+        // Show a toast/alert
+        const toast = document.getElementById('resultToast');
+        if (toast) {
+            document.getElementById('toastPerf').innerText = perf !== '-' ? perf + '/100' : '-';
+            document.getElementById('toastRel').innerText = rel !== '-' ? rel + '%' : '-';
+            new bootstrap.Toast(toast, {delay: 8000}).show();
+        }
+    }
+</script>
+{% endblock %}

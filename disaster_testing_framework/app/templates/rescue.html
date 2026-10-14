@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Rescue Requests</h2>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Priority</th>
+            <th>Type</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in requests %}
+        <tr>
+            <td>{{ r.name }}</td>
+            <td>{{ r.location }}</td>
+            <td>
+                <span class="badge {% if r.priority == 'Critical' %}bg-danger{% elif r.priority == 'High' %}bg-warning{% else %}bg-primary{% endif %}">
+                    {{ r.priority }}
+                </span>
+            </td>
+            <td>{{ r.emergency_type }}</td>
+            <td>{{ r.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

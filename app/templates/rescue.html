@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Rescue Requests{% endblock %}
+{% block heading %}Rescue Requests{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card-dark">
+      <h2>Submit Request</h2>
+      <p class="small text-warning">DEMO DATA only. This form does not contact real emergency services.</p>
+      <form method="post">
+        <div class="mb-2"><label class="form-label">Name</label><input class="form-control" name="name" required></div>
+        <div class="mb-2"><label class="form-label">Phone</label><input class="form-control" name="phone" required></div>
+        <div class="mb-2"><label class="form-label">Location</label><input class="form-control" name="location" required></div>
+        <div class="mb-2"><label class="form-label">Number of people</label><input class="form-control" type="number" min="1" name="people_count" value="1" required></div>
+        <div class="mb-2">
+          <label class="form-label">Emergency type</label>
+          <select class="form-select" name="emergency_type">
+            {% for t in disaster_types %}<option>{{ t }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Priority</label>
+          <select class="form-select" name="priority">
+            {% for p in priorities %}<option {{ 'selected' if p == 'Medium' else '' }}>{{ p }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" name="description" required></textarea></div>
+        <button class="btn btn-emergency w-100" type="submit">Submit Rescue Request</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card-dark">
+      <h2>All Requests</h2>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr><th>Name</th><th>Location</th><th>People</th><th>Type</th><th>Priority</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {% for r in requests %}
+            <tr>
+              <td>{{ r.name }}</td>
+              <td>{{ r.location }}</td>
+              <td>{{ r.people_count }}</td>
+              <td>{{ r.emergency_type }}</td>
+              <td>{{ r.priority }}</td>
+              <td><span class="badge bg-info text-dark">{{ r.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

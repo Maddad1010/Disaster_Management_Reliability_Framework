@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Test History{% endblock %}
+{% block heading %}Test History{% endblock %}
+{% block content %}
+<div class="card-dark">
+  <h2>Completed and running tests</h2>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Test ID</th><th>Type</th><th>Users</th><th>Duration</th>
+          <th>Avg Response</th><th>Success Rate</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in runs %}
+        <tr>
+          <td><a href="{{ url_for('testing.history_detail', public_id=r.public_id) }}">{{ r.public_id }}</a></td>
+          <td>{{ r.test_type }}</td>
+          <td>{{ r.users }}</td>
+          <td>{{ r.duration_seconds }}s</td>
+          <td>{{ r.avg_response_ms }} ms</td>
+          <td>{{ r.success_rate }}%</td>
+          <td>
+            {% set st = r.overall_status or r.run_status %}
+            {% set cls = 'bg-success' if st == 'PASS' else 'bg-warning text-dark' if st == 'WARNING' else 'bg-danger' if st == 'FAIL' else 'bg-secondary' %}
+            <span class="badge {{ cls }}">{{ st }}</span>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No tests recorded yet. Run a load test from Performance Testing.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

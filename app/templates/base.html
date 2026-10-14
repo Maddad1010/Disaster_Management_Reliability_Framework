@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Disaster Management Portal{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">DM</div>
+        <div>
+          <div class="brand-title">Disaster Portal</div>
+          <div class="brand-sub">SEP Academic Demo</div>
+        </div>
+      </div>
+      <nav class="side-nav">
+        <div class="nav-label">Portal</div>
+        <a class="{{ 'active' if page == 'dashboard' else '' }}" href="{{ url_for('portal.dashboard') }}">Dashboard</a>
+        <a class="{{ 'active' if page == 'alerts' else '' }}" href="{{ url_for('portal.alerts') }}">Disaster Alerts</a>
+        <a class="{{ 'active' if page == 'shelters' else '' }}" href="{{ url_for('portal.shelters') }}">Shelters</a>
+        <a class="{{ 'active' if page == 'rescue' else '' }}" href="{{ url_for('portal.rescue') }}">Rescue Requests</a>
+        <a class="{{ 'active' if page == 'reports' else '' }}" href="{{ url_for('portal.reports') }}">Reports</a>
+        <a class="{{ 'active' if page == 'contacts' else '' }}" href="{{ url_for('portal.contacts') }}">Emergency Contacts</a>
+        <div class="nav-label">Testing Framework</div>
+        <a class="{{ 'active' if page == 'testing' else '' }}" href="{{ url_for('testing.configure') }}">Performance Testing</a>
+        <a class="{{ 'active' if page == 'live' else '' }}" href="{{ url_for('testing.live_monitor') }}">Live Monitor</a>
+        <a class="{{ 'active' if page == 'history' else '' }}" href="{{ url_for('testing.history') }}">Test History</a>
+        <a class="{{ 'active' if page == 'health' else '' }}" href="{{ url_for('testing.system_health_page') }}">System Health</a>
+        <a class="{{ 'active' if page == 'settings' else '' }}" href="{{ url_for('testing.settings_page') }}">Settings</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <h1>{% block heading %}Operations Center{% endblock %}</h1>
+          <p class="top-sub">{% block subtitle %}Dummy data for Software Engineering Practice{% endblock %}</p>
+        </div>
+        <div class="top-pills">
+          <span class="pill pill-demo">DEMO DATA</span>
+          <span class="pill pill-online">SYSTEM ONLINE</span>
+        </div>
+      </header>
+      <main class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </main>
+      <footer class="app-footer">{{ demo_notice }}</footer>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,2 @@
+Test ID,Type,Date,Duration,Users,Requests,Success Rate,Avg Response,CPU,Memory,Perf Score,Rel Score
+T-f44c0ca2,Load,2026-10-04 13:58:53,14.7,100,1328,100.0%,907.79ms,38.8%,84.0%,79.6,100.0

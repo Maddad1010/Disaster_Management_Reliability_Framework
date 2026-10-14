@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ run.public_id }} Report{% endblock %}
+{% block heading %}Test {{ run.public_id }}{% endblock %}
+{% block content %}
+<div class="stat-grid">
+  <div class="card-dark"><div class="metric-label">Type</div><div class="metric-value" style="font-size:1.2rem">{{ run.test_type }}</div></div>
+  <div class="card-dark"><div class="metric-label">Users</div><div class="metric-value">{{ run.users }}</div></div>
+  <div class="card-dark"><div class="metric-label">Performance</div><div class="metric-value">{{ run.performance_score }}/100</div><div class="small">{{ run.performance_label }} · project-defined</div></div>
+  <div class="card-dark"><div class="metric-label">Reliability</div><div class="metric-value">{{ run.reliability_score }}%</div></div>
+  <div class="card-dark"><div class="metric-label">Status</div><div class="metric-value">{{ run.overall_status }}</div></div>
+</div>
+<div class="card-dark mb-3">
+  <p class="small text-warning">Academic demonstration metrics calculated from actual collected samples.</p>
+  <table class="table table-sm">
+    <tr><td>Total / Success / Fail</td><td>{{ run.total_requests }} / {{ run.successful_requests }} / {{ run.failed_requests }}</td></tr>
+    <tr><td>Avg / Min / Max response</td><td>{{ run.avg_response_ms }} / {{ run.min_response_ms }} / {{ run.max_response_ms }} ms</td></tr>
+    <tr><td>RPS / Error rate</td><td>{{ run.requests_per_second }} / {{ run.error_rate }}%</td></tr>
+    <tr><td>CPU avg/max</td><td>{{ run.avg_cpu }}% / {{ run.max_cpu }}%</td></tr>
+    <tr><td>Memory avg/max</td><td>{{ run.avg_memory }}% / {{ run.max_memory }}%</td></tr>
+    {% if run.breaking_point_users %}<tr><td>Breaking point</td><td>{{ run.breaking_point_users }} users</td></tr>{% endif %}
+  </table>
+  <div>
+    {% if run.html_report %}<a class="btn btn-sm btn-outline-info" href="{{ url_for('testing.download_report', filename=run.html_report) }}">HTML</a>{% endif %}
+    {% if run.json_report %}<a class="btn btn-sm btn-outline-info" href="{{ url_for('testing.download_report', filename=run.json_report) }}">JSON</a>{% endif %}
+    {% if run.csv_report %}<a class="btn btn-sm btn-outline-info" href="{{ url_for('testing.download_report', filename=run.csv_report) }}">CSV</a>{% endif %}
+    {% if run.pdf_report %}<a class="btn btn-sm btn-outline-info" href="{{ url_for('testing.download_report', filename=run.pdf_report) }}">PDF</a>{% endif %}
+  </div>
+</div>
+<div class="chart-grid">
+  <div class="card-dark"><canvas id="rt"></canvas></div>
+  <div class="card-dark"><canvas id="rps"></canvas></div>
+  <div class="card-dark"><canvas id="cpu"></canvas></div>
+  <div class="card-dark"><canvas id="mem"></canvas></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const samples = {{ samples | tojson }};
+const times = samples.map(s => s.elapsed_seconds);
+const mk = (id, label, data, color) => new Chart(document.getElementById(id), {
+  type: 'line',
+  data: { labels: times, datasets: [{ label, data, borderColor: color, tension: 0.25, fill: false, pointRadius: 0 }] },
+  options: { plugins: { legend: { labels: { color: '#e8eef7' } } }, scales: { x: { ticks: { color: '#93a9c4' } }, y: { ticks: { color: '#93a9c4' } } } }
+});
+mk('rt', 'Response ms', samples.map(s => s.avg_response_ms), '#f39c12');
+mk('rps', 'RPS', samples.map(s => s.rps), '#2ecc71');
+mk('cpu', 'CPU %', samples.map(s => s.cpu_percent), '#5dade2');
+mk('mem', 'Memory %', samples.map(s => s.memory_percent), '#af7ac5');
+</script>
+{% endblock %}

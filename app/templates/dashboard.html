@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Operations Dashboard{% endblock %}
+{% block heading %}Disaster Management Portal{% endblock %}
+{% block subtitle %}Current emergency picture — all figures are dummy demonstration data{% endblock %}
+{% block content %}
+<div class="stat-grid">
+  <div class="card-dark">
+    <div class="metric-label">System Status</div>
+    <div class="metric-value text-success">{{ stats.system_status }}</div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">Active Disasters</div>
+    <div class="metric-value text-warning">{{ stats.active_disasters }}</div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">Emergency Alerts</div>
+    <div class="metric-value" style="color:#ff8fa3">{{ stats.emergency_alerts }}</div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">Available Shelters</div>
+    <div class="metric-value" style="color:#4cc9f0">{{ stats.available_shelters }}</div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">Pending Rescue Requests</div>
+    <div class="metric-value" style="color:#e85d04">{{ stats.pending_rescue_requests }}</div>
+  </div>
+  <div class="card-dark">
+    <div class="metric-label">Affected Areas</div>
+    <div class="metric-value">{{ stats.affected_areas }}</div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card-dark">
+      <h2>Active Disasters <span class="badge bg-warning text-dark">DEMO DATA</span></h2>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>Type</th><th>Severity</th><th>Location</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for d in disasters %}
+            <tr>
+              <td>{{ d.disaster_type }}</td>
+              <td><span class="badge bg-danger">{{ d.severity }}</span></td>
+              <td>{{ d.location }}</td>
+              <td>{{ d.status }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card-dark">
+      <h2>Emergency Alerts</h2>
+      {% for a in alerts %}
+        <div class="mb-3 pb-2 border-bottom border-secondary">
+          <strong>{{ a.title }}</strong>
+          <div class="small text-warning">{{ a.severity }} · {{ a.location }}</div>
+          <div class="small">{{ a.description }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
