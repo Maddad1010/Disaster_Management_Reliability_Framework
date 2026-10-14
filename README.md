@@ -59,23 +59,6 @@ python run.py
 
 ---
 
-## Recommended professor demo (5–7 minutes)
-
-1. Open **Dashboard** — show ONLINE status, dummy disasters, alerts, shelters.
-2. Open **Disaster Alerts** and **Shelters** — emphasize **DEMO DATA**.
-3. Open **Performance Testing**.
-4. Select **Load Test**, **100 users**, **60 seconds**, endpoint `/api/alerts`.
-5. Click **START TEST**.
-6. Watch **Live Monitor**: banner switches to **LIVE TEST DATA**, charts move, CPU/RAM update.
-7. After completion, read **Performance Score** and **Reliability Score**.
-8. Open **Test History**, open the run, download the **HTML** report.
-
-Optional reliability demo: on the testing page set **Failure Probability = 10%**, apply simulation, re-run a short load test, and show a higher error rate.
-
-When idle, the live dashboard may show **DEMO DATA** so charts are never blank. That sample is replaced by **LIVE TEST DATA** as soon as a real test is running.
-
----
-
 ## Project structure
 
 ```
@@ -244,11 +227,3 @@ locust -f locust/spike_shape.py --host http://127.0.0.1:5000 --headless --users 
 ## Technologies
 
 Python 3.11+, Flask, SQLAlchemy, SQLite, Jinja2, Bootstrap 5, Chart.js, httpx, psutil, Locust, pytest, ReportLab.
-
----
-
-## Safety
-
-Do not connect this project to real emergency networks, SMS gateways, or personal data. Footer on every page:
-
-*Academic Demonstration System — Not for Real Emergency Operations.*
