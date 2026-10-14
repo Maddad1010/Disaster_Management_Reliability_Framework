@@ -27,7 +27,7 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {"connect_args": {"check_same_thread": False}}
     JSON_SORT_KEYS = False
 
-    HOST = os.environ.get("APP_HOST", "127.0.0.1")
+    HOST = os.environ.get("APP_HOST", "0.0.0.0")
     PORT = int(os.environ.get("APP_PORT", "5000"))
     BASE_URL = os.environ.get("APP_BASE_URL", f"http://{HOST}:{PORT}")
 
