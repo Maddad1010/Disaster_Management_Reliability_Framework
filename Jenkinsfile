@@ -1,4 +1,3 @@
-```groovy
 pipeline {
     agent any
 
@@ -146,20 +145,32 @@ pipeline {
                 ]) {
                     sh '''
                         set -eu
-                        export AWS_DEFAULT_REGION="$AWS_REGION"
+                        export AWS_DEFAULT_REGION="${AWS_REGION}"
 
-                        ACCOUNT_ID=$(aws sts get-caller-identity \
-                          --query Account --output text)
+                        AWS_CLI_IMAGE="public.ecr.aws/aws-cli/aws-cli:latest"
 
-                        REGISTRY="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+                        ACCOUNT_ID=$(docker run --rm \
+                            -e AWS_ACCESS_KEY_ID \
+                            -e AWS_SECRET_ACCESS_KEY \
+                            -e AWS_DEFAULT_REGION \
+                            "$AWS_CLI_IMAGE" \
+                            sts get-caller-identity \
+                            --query Account --output text)
 
-                        aws ecr get-login-password --region "$AWS_REGION" |
-                          docker login \
-                            --username AWS \
-                            --password-stdin "$REGISTRY"
+                        REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+                        docker run --rm \
+                            -e AWS_ACCESS_KEY_ID \
+                            -e AWS_SECRET_ACCESS_KEY \
+                            -e AWS_DEFAULT_REGION \
+                            "$AWS_CLI_IMAGE" \
+                            ecr get-login-password |
+                            docker login --username AWS --password-stdin "$REGISTRY"
 
                         docker tag "$APP_IMAGE" "$ECR_REPOSITORY_URL:$BUILD_NUMBER"
                         docker push "$ECR_REPOSITORY_URL:$BUILD_NUMBER"
+
+                        echo "Image pushed successfully: $ECR_REPOSITORY_URL:$BUILD_NUMBER"
                     '''
                 }
             }
@@ -214,4 +225,3 @@ pipeline {
         }
     }
 }
-```
