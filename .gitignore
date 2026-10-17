@@ -13,3 +13,9 @@ reports/*.pdf
 .idea/
 .vscode/
 *.db
+terraform/tfplan
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform/
+terraform/ec2_ip.txt
+terraform/ecr_url.txt

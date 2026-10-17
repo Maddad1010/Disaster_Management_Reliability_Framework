@@ -1,9 +1,10 @@
+```groovy
 pipeline {
     agent any
 
     environment {
         AWS_REGION = 'ap-south-1'
-        EC2_KEY_NAME = 'your-key-pair-name'
+        EC2_KEY_NAME = 'disaster-management-key'
         SSH_ALLOWED_CIDR = '103.134.130.254/32'
         APP_ALLOWED_CIDR = '0.0.0.0/0'
 
@@ -45,7 +46,6 @@ pipeline {
             steps {
                 sh '''
                     set -eu
-
                     mkdir -p reports
 
                     curl -fsSL \
@@ -56,7 +56,6 @@ pipeline {
                       --format '{{range .Mounts}}{{if eq .Destination "/var/jenkins_home"}}{{.Name}}{{end}}{{end}}')
 
                     test -n "$JENKINS_VOLUME"
-
                     WORKSPACE_REL="${WORKSPACE#/var/jenkins_home/}"
 
                     docker run --rm \
@@ -99,7 +98,6 @@ pipeline {
 
                             test -n "$JENKINS_VOLUME"
                             WORKSPACE_REL="${WORKSPACE#/var/jenkins_home/}"
-
                             TF_DIR="/jenkins_home/$WORKSPACE_REL/terraform"
 
                             tf() {
@@ -148,16 +146,17 @@ pipeline {
                 ]) {
                     sh '''
                         set -eu
-
                         export AWS_DEFAULT_REGION="$AWS_REGION"
 
                         ACCOUNT_ID=$(aws sts get-caller-identity \
                           --query Account --output text)
 
+                        REGISTRY="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+
                         aws ecr get-login-password --region "$AWS_REGION" |
                           docker login \
                             --username AWS \
-                            --password-stdin "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+                            --password-stdin "$REGISTRY"
 
                         docker tag "$APP_IMAGE" "$ECR_REPOSITORY_URL:$BUILD_NUMBER"
                         docker push "$ECR_REPOSITORY_URL:$BUILD_NUMBER"
@@ -173,35 +172,32 @@ pipeline {
                         credentialsId: 'ec2-ssh-key',
                         keyFileVariable: 'EC2_PRIVATE_KEY',
                         usernameVariable: 'SSH_USER'
-                    ),
-                    string(credentialsId: 'aws-access-key-id',
-                           variable: 'AWS_ACCESS_KEY_ID'),
-                    string(credentialsId: 'aws-secret-access-key',
-                           variable: 'AWS_SECRET_ACCESS_KEY')
+                    )
                 ]) {
                     sh '''
                         set -eu
-
                         chmod 600 "$EC2_PRIVATE_KEY"
 
-                        ACCOUNT_ID=$(aws sts get-caller-identity \
-                          --query Account --output text)
+                        REGISTRY="${ECR_REPOSITORY_URL%%/*}"
 
                         ssh -i "$EC2_PRIVATE_KEY" \
                           -o StrictHostKeyChecking=accept-new \
+                          -o ConnectTimeout=30 \
                           "$SSH_USER@$EC2_PUBLIC_IP" \
-                          "sudo docker pull '$ECR_REPOSITORY_URL:$BUILD_NUMBER' &&
-                           sudo docker rm -f disaster-app 2>/dev/null || true"
+                          "set -e
+                           aws ecr get-login-password --region '$AWS_REGION' |
+                             sudo docker login --username AWS --password-stdin '$REGISTRY'
 
-                        ssh -i "$EC2_PRIVATE_KEY" \
-                          -o StrictHostKeyChecking=accept-new \
-                          "$SSH_USER@$EC2_PUBLIC_IP" \
-                          "sudo docker run -d --restart unless-stopped \
-                           --name disaster-app \
-                           -p 5000:5000 \
-                           '$ECR_REPOSITORY_URL:$BUILD_NUMBER'"
+                           sudo docker pull '$ECR_REPOSITORY_URL:$BUILD_NUMBER'
 
-                        echo "Deployment command completed."
+                           sudo docker rm -f disaster-app || true
+
+                           sudo docker run -d --restart unless-stopped \
+                             --name disaster-app \
+                             -p 5000:5000 \
+                             '$ECR_REPOSITORY_URL:$BUILD_NUMBER'"
+
+                        echo "Deployment completed."
                         echo "Application URL: http://$EC2_PUBLIC_IP:5000"
                     '''
                 }
@@ -218,3 +214,4 @@ pipeline {
         }
     }
 }
+```
