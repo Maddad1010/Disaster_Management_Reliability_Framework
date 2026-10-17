@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION = 'ap-south-1'
         EC2_KEY_NAME = 'your-key-pair-name'
-        SSH_ALLOWED_CIDR = 'YOUR_PUBLIC_IP/32'
+        SSH_ALLOWED_CIDR = '103.134.130.254/32'
         APP_ALLOWED_CIDR = '0.0.0.0/0'
 
         SONAR_SCANNER_HOME = tool 'SonarScanner'
